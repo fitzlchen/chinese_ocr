@@ -6,6 +6,7 @@ from PIL import Image
 from ctpn.text_detect import text_detect
 from ctpn.lib.fast_rcnn.config import cfg_from_file
 from densenet.model import predict as keras_densenet
+from angle.predict import predict as angle_detect
 
 
 def sort_box(box):
@@ -70,11 +71,22 @@ def charRec(img, text_recs, adjust=False):
  
    return results
 
-def model(img, adjust=False):
+def model(img, adjust=False, detectAngle=False):
     """
     @img: 图片
     @adjust: 是否调整文字识别结果
     """
+    angle = 0
+    if detectAngle:
+        angle = angle_detect(img=np.copy(img))  ##文字朝向检测
+        im = Image.fromarray(img)
+        if angle == 90:
+            im = im.transpose(Image.ROTATE_90)
+        elif angle == 180:
+            im = im.transpose(Image.ROTATE_180)
+        elif angle == 270:
+            im = im.transpose(Image.ROTATE_270)
+        img = np.array(im)
     cfg_from_file('./ctpn/ctpn/text.yml')
     text_recs, img_framed, img = text_detect(img)
     text_recs = sort_box(text_recs)
