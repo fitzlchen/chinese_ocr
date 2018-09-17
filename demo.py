@@ -11,13 +11,11 @@ image_files = glob('./test_images/*.*')
 
 if __name__ == '__main__':
     result_dir = './test_result'
-    image_file = image_files[0]
     # if os.path.exists(result_dir):
     #     shutil.rmtree(result_dir)
     # os.mkdir(result_dir)
 
-    # for image_file in sorted(image_files):
-    for i in range(1000):
+    for image_file in sorted(image_files):
         image = np.array(Image.open(image_file).convert('RGB'))
         t = time.time()
         result, image_framed = ocr.model(image, detectAngle=True)

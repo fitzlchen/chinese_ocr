@@ -5,6 +5,7 @@ import pytesseract as pyt
 import glob
 import re
 import numpy as np
+import time
 from keras.optimizers import SGD
 
 
@@ -44,7 +45,7 @@ def rotate_image(angle, img):
 
 
 def ocr(img):
-    result = pyt.image_to_string(img)
+    result = pyt.image_to_string(img, lang='ocrb')
     return result
 
 
@@ -62,10 +63,12 @@ if __name__ == '__main__':
     for image in images:
         image_name = image.title()
         image = Image.open(image).convert('RGB')
+        start_time = time.time()
         # 图片倾斜矫正
         angle = angle_detect(image)
         image = rotate_image(angle, image)
         # 内容识别
         sentence = ocr(image)
+        print('recognized content:{}'.format(sentence))
         id = extract_id_number(sentence)
-        print('image:{}, recognize id:{}'.format(image_name, id))
+        print('image:{}, recognize id:{}, takes:{}s'.format(image_name, id, time.time()-start_time))
